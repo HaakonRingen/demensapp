@@ -38,8 +38,8 @@ export default function AppNavigator() {
         callerRelation={callerContact?.relation ?? 'Ukjent'}
         callerEmoji={callerContact?.emoji ?? '👤'}
         autoAnswerSeconds={8}
-        onAccept={() => acceptCall(callState.invite)}
-        onReject={() => rejectCall(callState.invite)}
+        onAccept={() => acceptCall(callState.callId, callState.callerIdentity)}
+        onReject={() => rejectCall()}
       />
     );
   }

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Voice, Call, CallInvite } from '@twilio/voice-react-native-sdk';
+import { Voice, Call } from '@twilio/voice-react-native-sdk';
 import { BACKEND_URL, PATIENT_IDENTITY } from '../config';
 
 export type CallState =
   | { status: 'idle' }
-  | { status: 'incoming'; invite: CallInvite; callerIdentity: string }
+  | { status: 'incoming'; callId: string; callerIdentity: string; conferenceName: string }
   | { status: 'active'; call: Call; remoteIdentity: string }
   | { status: 'connecting'; remoteIdentity: string };
 
@@ -23,54 +23,70 @@ async function fetchToken(identity: string): Promise<string> {
 export function useVoice() {
   const [callState, setCallState] = useState<CallState>({ status: 'idle' });
   const activeCallRef = useRef<Call | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const callStateRef = useRef<CallState>({ status: 'idle' });
+
+  // Hold callStateRef synkronisert
+  useEffect(() => {
+    callStateRef.current = callState;
+  }, [callState]);
 
   useEffect(() => {
-    let registered = false;
-
-    async function setup() {
+    // Poll etter innkommende anrop hvert 2. sekund
+    pollingRef.current = setInterval(async () => {
+      if (callStateRef.current.status !== 'idle') return;
       try {
-        const token = await fetchToken(PATIENT_IDENTITY);
-        // register() krever VoIP-sertifikat for innkommende anrop via push.
-        // Hopper over dette for nå – utgående anrop fungerer uten.
-        try {
-          await voice.register(token);
-          registered = true;
-          console.log('Twilio registrert (innkommende anrop aktivt)');
-        } catch (pushErr) {
-          console.warn('PushKit ikke klar – innkommende anrop via push deaktivert. Utgående anrop fungerer fortsatt.', pushErr);
+        const res = await fetch(`${BACKEND_URL}/pending-call/${PATIENT_IDENTITY}`);
+        const data = await res.json();
+        if (data.hasPendingCall && data.call) {
+          setCallState({
+            status: 'incoming',
+            callId: data.call.callId,
+            callerIdentity: data.call.callerIdentity,
+            conferenceName: data.call.conferenceName,
+          });
         }
-      } catch (e) {
-        console.error('Twilio token-henting feilet:', e);
-      }
-    }
-
-    setup();
-
-    // Lytter på innkommende anrop
-    voice.on(Voice.Event.CallInvite, (invite: CallInvite) => {
-      const callerIdentity = invite.from?.replace('client:', '') ?? 'Ukjent';
-      setCallState({ status: 'incoming', invite, callerIdentity });
-    });
+      } catch (_) {}
+    }, 2000);
 
     return () => {
-      voice.removeAllListeners(Voice.Event.CallInvite);
-      if (registered) voice.unregister().catch(() => {});
+      if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, []);
 
-  async function acceptCall(invite: CallInvite) {
-    const call = await invite.accept();
-    activeCallRef.current = call;
-    const remoteIdentity = invite.from?.replace('client:', '') ?? 'Ukjent';
-    setCallState({ status: 'active', call, remoteIdentity });
-    call.on(Call.Event.Disconnected, () => {
+  async function acceptCall(callId: string, callerIdentity: string) {
+    try {
+      setCallState({ status: 'connecting', remoteIdentity: callerIdentity });
+      const token = await fetchToken(PATIENT_IDENTITY);
+
+      // Koble til konferansen via /answer-call
+      const call = await voice.connect(token, {
+        params: {
+          To: 'conference',
+          Identity: PATIENT_IDENTITY,
+          CallId: callId,
+        },
+      });
+
+      activeCallRef.current = call;
+      setCallState({ status: 'active', call, remoteIdentity: callerIdentity });
+
+      call.on(Call.Event.Disconnected, () => {
+        setCallState({ status: 'idle' });
+        activeCallRef.current = null;
+      });
+    } catch (e) {
+      console.error('Svar feilet:', e);
       setCallState({ status: 'idle' });
-      activeCallRef.current = null;
-    });
+    }
   }
 
-  async function rejectCall(invite: CallInvite) {
-    await invite.reject();
+  async function rejectCall() {
+    await fetch(`${BACKEND_URL}/reject-call`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identity: PATIENT_IDENTITY }),
+    });
     setCallState({ status: 'idle' });
   }
 
