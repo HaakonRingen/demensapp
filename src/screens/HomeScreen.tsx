@@ -63,10 +63,19 @@ export default function HomeScreen({ navigation }: any) {
         <TouchableOpacity
           style={[styles.bigButton, styles.buttonBlue]}
           activeOpacity={0.7}
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Medication')}
         >
           <Text style={styles.buttonIcon}>💊</Text>
           <Text style={styles.buttonText}>Medisiner</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bigButton, styles.buttonPurple]}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('Today')}
+        >
+          <Text style={styles.buttonIcon}>📅</Text>
+          <Text style={styles.buttonText}>Dagens plan</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -116,6 +125,9 @@ const styles = StyleSheet.create({
   },
   buttonBlue: {
     backgroundColor: '#1a55cc',
+  },
+  buttonPurple: {
+    backgroundColor: '#6622aa',
   },
   buttonIcon: {
     fontSize: 40,

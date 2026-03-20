@@ -7,19 +7,69 @@ import IncomingCallScreen from '../screens/IncomingCallScreen';
 import ActiveCallScreen from '../screens/ActiveCallScreen';
 import GuardianPinScreen from '../screens/GuardianPinScreen';
 import GuardianDashboardScreen from '../screens/GuardianDashboardScreen';
+import MedicationScreen from '../screens/MedicationScreen';
+import TodayScreen from '../screens/TodayScreen';
+import { useVoice } from '../hooks/useVoice';
 
 const Stack = createStackNavigator();
 
+// Kontakter med Twilio-identitet
+export const CONTACTS = [
+  { id: '1', name: 'Håkon', relation: 'Sønn', emoji: '👨', identity: 'hakon' },
+  { id: '2', name: 'Kari', relation: 'Datter', emoji: '👩', identity: 'kari' },
+  { id: '3', name: 'Per', relation: 'Barnebarn', emoji: '👦', identity: 'per' },
+  { id: '4', name: 'Lege Olsen', relation: 'Fastlege', emoji: '👨‍⚕️', identity: 'lege_olsen' },
+];
+
 export default function AppNavigator() {
   const [guardianUnlocked, setGuardianUnlocked] = useState(false);
+  const { callState, makeCall, acceptCall, rejectCall, hangUp } = useVoice();
+
+  // Finn kontaktinfo basert på identity
+  const callerContact = callState.status === 'incoming' || callState.status === 'active' || callState.status === 'connecting'
+    ? CONTACTS.find(c => c.identity === (callState.status === 'incoming' ? callState.callerIdentity : callState.remoteIdentity))
+    : null;
+
+  // Vis innkommende anrop over alt annet
+  if (callState.status === 'incoming') {
+    return (
+      <IncomingCallScreen
+        callerName={callerContact?.name ?? callState.callerIdentity}
+        callerRelation={callerContact?.relation ?? 'Ukjent'}
+        callerEmoji={callerContact?.emoji ?? '👤'}
+        autoAnswerSeconds={8}
+        onAccept={() => acceptCall(callState.invite)}
+        onReject={() => rejectCall(callState.invite)}
+      />
+    );
+  }
+
+  // Vis aktiv samtale over alt annet
+  if (callState.status === 'active' || callState.status === 'connecting') {
+    return (
+      <ActiveCallScreen
+        callerName={callerContact?.name ?? callState.remoteIdentity}
+        callerEmoji={callerContact?.emoji ?? '👤'}
+        connecting={callState.status === 'connecting'}
+        onHangUp={hangUp}
+      />
+    );
+  }
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Contacts" component={ContactsScreen} />
-        <Stack.Screen name="IncomingCall" component={IncomingCallScreen} />
-        <Stack.Screen name="ActiveCall" component={ActiveCallScreen} />
+        <Stack.Screen name="Contacts">
+          {(props) => (
+            <ContactsScreen
+              {...props}
+              onCall={(identity) => makeCall(identity)}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="Medication" component={MedicationScreen} />
+        <Stack.Screen name="Today" component={TodayScreen} />
         <Stack.Screen name="GuardianPin">
           {(props) => (
             <GuardianPinScreen

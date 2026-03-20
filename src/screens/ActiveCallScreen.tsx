@@ -4,27 +4,29 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-na
 interface Props {
   callerName: string;
   callerEmoji: string;
+  connecting?: boolean;
   onHangUp: () => void;
 }
 
 function pad(n: number) { return n < 10 ? `0${n}` : `${n}`; }
 
-export default function ActiveCallScreen({ callerName, callerEmoji, onHangUp }: Props) {
+export default function ActiveCallScreen({ callerName, callerEmoji, connecting, onHangUp }: Props) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
+    if (connecting) return;
     const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [connecting]);
 
   const duration = `${pad(Math.floor(seconds / 60))}:${pad(seconds % 60)}`;
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.status}>Snakker med</Text>
+      <Text style={styles.status}>{connecting ? 'Ringer...' : 'Snakker med'}</Text>
       <Text style={styles.emoji}>{callerEmoji}</Text>
       <Text style={styles.name}>{callerName}</Text>
-      <Text style={styles.duration}>{duration}</Text>
+      {!connecting && <Text style={styles.duration}>{duration}</Text>}
 
       <TouchableOpacity style={styles.hangupButton} onPress={onHangUp}>
         <Text style={styles.hangupText}>📵 Legg på</Text>

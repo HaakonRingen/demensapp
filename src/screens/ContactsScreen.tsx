@@ -1,22 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { CONTACTS } from '../navigation/AppNavigator';
 
-const CONTACTS = [
-  { id: '1', name: 'Håkon', relation: 'Sønn', emoji: '👨' },
-  { id: '2', name: 'Kari', relation: 'Datter', emoji: '👩' },
-  { id: '3', name: 'Per', relation: 'Barnebarn', emoji: '👦' },
-  { id: '4', name: 'Lege Olsen', relation: 'Fastlege', emoji: '👨‍⚕️' },
-];
+interface Props {
+  navigation: any;
+  onCall: (identity: string) => void;
+}
 
-export default function ContactsScreen({ navigation }: any) {
+export default function ContactsScreen({ navigation, onCall }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -31,7 +22,7 @@ export default function ContactsScreen({ navigation }: any) {
             key={contact.id}
             style={styles.contactCard}
             activeOpacity={0.7}
-            onPress={() => {/* TODO: start call */}}
+            onPress={() => onCall(contact.identity)}
           >
             <Text style={styles.emoji}>{contact.emoji}</Text>
             <Text style={styles.name}>{contact.name}</Text>
