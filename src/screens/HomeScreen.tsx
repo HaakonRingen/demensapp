@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 
 const DAYS = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
 const MONTHS = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
@@ -15,8 +15,22 @@ function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: any) {
   const [now, setNow] = useState(new Date());
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleDateTap = () => {
+    const next = tapCount + 1;
+    setTapCount(next);
+    if (tapTimer.current) clearTimeout(tapTimer.current);
+    if (next >= 5) {
+      setTapCount(0);
+      navigation.navigate('GuardianPin');
+      return;
+    }
+    tapTimer.current = setTimeout(() => setTapCount(0), 2000);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -29,11 +43,33 @@ export default function HomeScreen() {
   const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.greeting}>{greeting}</Text>
       <Text style={styles.clock}>{timeStr}</Text>
-      <Text style={styles.date}>{dateStr}</Text>
-    </View>
+      <TouchableOpacity onPress={handleDateTap} activeOpacity={1}>
+        <Text style={styles.date}>{dateStr}</Text>
+      </TouchableOpacity>
+
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={styles.bigButton}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('Contacts')}
+        >
+          <Text style={styles.buttonIcon}>📞</Text>
+          <Text style={styles.buttonText}>Ring noen</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bigButton, styles.buttonBlue]}
+          activeOpacity={0.7}
+          onPress={() => {}}
+        >
+          <Text style={styles.buttonIcon}>💊</Text>
+          <Text style={styles.buttonText}>Medisiner</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -46,10 +82,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   greeting: {
-    fontSize: 42,
+    fontSize: 38,
     color: '#FFD700',
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 8,
     textAlign: 'center',
   },
   clock: {
@@ -59,9 +95,34 @@ const styles = StyleSheet.create({
     letterSpacing: 4,
   },
   date: {
-    fontSize: 32,
+    fontSize: 28,
     color: '#AAAACC',
-    marginTop: 16,
+    marginTop: 8,
+    marginBottom: 48,
     textAlign: 'center',
+  },
+  buttons: {
+    width: '100%',
+    gap: 16,
+  },
+  bigButton: {
+    backgroundColor: '#00aa44',
+    borderRadius: 24,
+    paddingVertical: 28,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+  },
+  buttonBlue: {
+    backgroundColor: '#1a55cc',
+  },
+  buttonIcon: {
+    fontSize: 40,
+  },
+  buttonText: {
+    fontSize: 36,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
 });

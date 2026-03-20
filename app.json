@@ -2,6 +2,7 @@
   "expo": {
     "name": "demensapp",
     "slug": "demensapp",
+    "owner": "haakonringen",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.haakonringen.demensapp",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Appen trenger mikrofon for å ringe.",
+        "NSCameraUsageDescription": "Appen trenger kamera for videosamtaler.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +32,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "24132aac-b8cd-414c-a5e9-36aa181574d4"
+      }
     }
   }
 }
