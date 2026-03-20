@@ -30,11 +30,17 @@ export function useVoice() {
     async function setup() {
       try {
         const token = await fetchToken(PATIENT_IDENTITY);
-        await voice.register(token);
-        registered = true;
-        console.log('Twilio registrert for:', PATIENT_IDENTITY);
+        // register() krever VoIP-sertifikat for innkommende anrop via push.
+        // Hopper over dette for nå – utgående anrop fungerer uten.
+        try {
+          await voice.register(token);
+          registered = true;
+          console.log('Twilio registrert (innkommende anrop aktivt)');
+        } catch (pushErr) {
+          console.warn('PushKit ikke klar – innkommende anrop via push deaktivert. Utgående anrop fungerer fortsatt.', pushErr);
+        }
       } catch (e) {
-        console.error('Twilio registrering feilet:', e);
+        console.error('Twilio token-henting feilet:', e);
       }
     }
 

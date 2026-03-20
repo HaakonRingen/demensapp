@@ -18,7 +18,8 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Appen trenger mikrofon for å ringe.",
         "NSCameraUsageDescription": "Appen trenger kamera for videosamtaler.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["voip", "audio", "fetch", "remote-notification"]
       }
     },
     "android": {
