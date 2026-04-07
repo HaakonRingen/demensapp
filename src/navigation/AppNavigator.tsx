@@ -13,12 +13,12 @@ import { useVoice } from '../hooks/useVoice';
 
 const Stack = createStackNavigator();
 
-// Kontakter med Twilio-identitet
+// Kontakter – identity = app-bruker, phone = vanlig telefonnummer
 export const CONTACTS = [
   { id: '1', name: 'Håkon', relation: 'Sønn', emoji: '👨', identity: 'hakon' },
   { id: '2', name: 'Kari', relation: 'Datter', emoji: '👩', identity: 'kari' },
   { id: '3', name: 'Per', relation: 'Barnebarn', emoji: '👦', identity: 'per' },
-  { id: '4', name: 'Lege Olsen', relation: 'Fastlege', emoji: '👨‍⚕️', identity: 'lege_olsen' },
+  { id: '4', name: 'Lege Olsen', relation: 'Fastlege', emoji: '👨‍⚕️', phone: '+4712345678' },
 ];
 
 export default function AppNavigator() {
@@ -38,7 +38,7 @@ export default function AppNavigator() {
         callerRelation={callerContact?.relation ?? 'Ukjent'}
         callerEmoji={callerContact?.emoji ?? '👤'}
         autoAnswerSeconds={8}
-        onAccept={() => acceptCall(callState.callId, callState.callerIdentity)}
+        onAccept={() => acceptCall(callState.callId, callState.callerIdentity, callState.invite)}
         onReject={() => rejectCall()}
       />
     );
@@ -64,7 +64,7 @@ export default function AppNavigator() {
           {(props) => (
             <ContactsScreen
               {...props}
-              onCall={(identity) => makeCall(identity)}
+              onCall={(to) => makeCall(to)}
             />
           )}
         </Stack.Screen>

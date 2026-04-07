@@ -1,5 +1,5 @@
-// Bytt denne til ngrok-URL når den endrer seg
-export const BACKEND_URL = 'https://8eb3-129-241-236-69.ngrok-free.app';
+// Railway backend URL – oppdater etter deploy
+export const BACKEND_URL = 'https://SETT-INN-RAILWAY-URL-HER.railway.app';
 
-// Identiteten til demenspasientens enhet
-export const PATIENT_IDENTITY = 'bruker_ola';
+// Identiteten til farmors enhet
+export const PATIENT_IDENTITY = 'farmor';

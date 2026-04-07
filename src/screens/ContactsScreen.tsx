@@ -4,7 +4,7 @@ import { CONTACTS } from '../navigation/AppNavigator';
 
 interface Props {
   navigation: any;
-  onCall: (identity: string) => void;
+  onCall: (to: string) => void;
 }
 
 export default function ContactsScreen({ navigation, onCall }: Props) {
@@ -22,7 +22,7 @@ export default function ContactsScreen({ navigation, onCall }: Props) {
             key={contact.id}
             style={styles.contactCard}
             activeOpacity={0.7}
-            onPress={() => onCall(contact.identity)}
+            onPress={() => onCall(contact.phone ?? contact.identity ?? '')}
           >
             <Text style={styles.emoji}>{contact.emoji}</Text>
             <Text style={styles.name}>{contact.name}</Text>
