@@ -16,9 +16,7 @@ const Stack = createStackNavigator();
 // Kontakter – identity = app-bruker, phone = vanlig telefonnummer
 export const CONTACTS = [
   { id: '1', name: 'Håkon', relation: 'Sønn', emoji: '👨', identity: 'hakon' },
-  { id: '2', name: 'Kari', relation: 'Datter', emoji: '👩', identity: 'kari' },
-  { id: '3', name: 'Per', relation: 'Barnebarn', emoji: '👦', identity: 'per' },
-  { id: '4', name: 'Lege Olsen', relation: 'Fastlege', emoji: '👨‍⚕️', phone: '+4712345678' },
+  { id: '2', name: 'Halvor', relation: 'Sønn', emoji: '👦', phone: '+4790225009' },
 ];
 
 export default function AppNavigator() {

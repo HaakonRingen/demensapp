@@ -19,7 +19,7 @@
         "NSMicrophoneUsageDescription": "Appen trenger mikrofon for å ringe.",
         "NSCameraUsageDescription": "Appen trenger kamera for videosamtaler.",
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": ["voip", "audio", "fetch", "remote-notification"]
+        "UIBackgroundModes": ["audio", "fetch", "remote-notification"]
       }
     },
     "android": {
@@ -35,7 +35,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      "expo-notifications"
     ],
     "extra": {
       "eas": {

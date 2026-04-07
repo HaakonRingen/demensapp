@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Voice, Call, CallInvite } from '@twilio/voice-react-native-sdk';
+import * as Notifications from 'expo-notifications';
 import { BACKEND_URL, PATIENT_IDENTITY } from '../config';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowList: true,
+  }),
+});
 
 export type CallState =
   | { status: 'idle' }
@@ -31,8 +41,42 @@ export function useVoice() {
     callStateRef.current = callState;
   }, [callState]);
 
+  function handleIncomingCallData(data: any) {
+    if (callStateRef.current.status !== 'idle') return;
+    if (data?.callId && data?.callerIdentity) {
+      setCallState({
+        status: 'incoming',
+        callId: data.callId,
+        callerIdentity: data.callerIdentity,
+      });
+    }
+  }
+
   useEffect(() => {
     async function setup() {
+      // Registrer for Expo push-varsler
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status === 'granted') {
+          const tokenData = await Notifications.getExpoPushTokenAsync({
+            projectId: '24132aac-b8cd-414c-a5e9-36aa181574d4',
+          });
+          await fetch(`${BACKEND_URL}/register-push-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identity: PATIENT_IDENTITY, pushToken: tokenData.data }),
+          });
+        }
+      } catch (e) {
+        console.warn('Push token registrering feilet:', e);
+      }
+
+      // Sjekk om appen ble åpnet fra et varseltap
+      const lastResponse = await Notifications.getLastNotificationResponseAsync();
+      if (lastResponse) {
+        handleIncomingCallData(lastResponse.notification.request.content.data);
+      }
+
       try {
         const token = await fetchToken(PATIENT_IDENTITY);
 
@@ -65,10 +109,16 @@ export function useVoice() {
 
     setup();
 
+    // Lytter på varseltap mens appen kjører
+    const responseSub = Notifications.addNotificationResponseReceivedListener((response) => {
+      handleIncomingCallData(response.notification.request.content.data);
+    });
+
     return () => {
       voice.removeAllListeners(Voice.Event.CallInvite);
       if (pollingRef.current) clearInterval(pollingRef.current);
       if (pushKitRegistered.current) voice.unregister().catch(() => {});
+      responseSub.remove();
     };
   }, []);
 
