@@ -44,21 +44,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   status: {
-    fontSize: 28,
+    fontSize: 36,
     color: '#AAAACC',
     marginBottom: 24,
   },
   emoji: {
-    fontSize: 120,
+    fontSize: 140,
     marginBottom: 16,
   },
   name: {
-    fontSize: 56,
+    fontSize: 72,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
   duration: {
-    fontSize: 40,
+    fontSize: 52,
     color: '#FFD700',
     marginTop: 16,
     marginBottom: 64,
@@ -66,13 +66,13 @@ const styles = StyleSheet.create({
   },
   hangupButton: {
     backgroundColor: '#aa2200',
-    borderRadius: 24,
-    paddingVertical: 28,
-    paddingHorizontal: 60,
+    borderRadius: 32,
+    paddingVertical: 40,
+    paddingHorizontal: 80,
     alignItems: 'center',
   },
   hangupText: {
-    fontSize: 36,
+    fontSize: 48,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },

@@ -91,20 +91,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   greeting: {
-    fontSize: 38,
+    fontSize: 48,
     color: '#FFD700',
     fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'center',
   },
   clock: {
-    fontSize: 96,
+    fontSize: 120,
     color: '#FFFFFF',
     fontWeight: '200',
     letterSpacing: 4,
   },
   date: {
-    fontSize: 28,
+    fontSize: 36,
     color: '#AAAACC',
     marginTop: 8,
     marginBottom: 48,
@@ -112,12 +112,12 @@ const styles = StyleSheet.create({
   },
   buttons: {
     width: '100%',
-    gap: 16,
+    gap: 20,
   },
   bigButton: {
     backgroundColor: '#00aa44',
-    borderRadius: 24,
-    paddingVertical: 28,
+    borderRadius: 32,
+    paddingVertical: 40,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -130,10 +130,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#6622aa',
   },
   buttonIcon: {
-    fontSize: 40,
+    fontSize: 52,
   },
   buttonText: {
-    fontSize: 36,
+    fontSize: 46,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
